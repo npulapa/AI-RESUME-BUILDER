@@ -1,0 +1,690 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ResumeCraft AI – Smart Career Studio</title>
+  <style>
+    :root {
+      font-family: "Segoe UI", Arial, sans-serif;
+      color: #18233f;
+      background: #f3f6ff;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(circle at 10% 5%, #e0e7ff 0, transparent 35%), #f6f7fc;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top Navigation Bar */
+    .topbar {
+      min-height: 68px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 5%;
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid #e6eaf4;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .brand {
+      color: #2563eb;
+      font-size: 21px;
+      font-weight: 800;
+      text-decoration: none;
+      letter-spacing: -0.3px;
+    }
+
+    .tag, .muted {
+      color: #64748b;
+      font-size: 14px;
+    }
+
+    /* Split-Screen Workspace */
+    .workspace {
+      width: min(1280px, 94%);
+      margin: 24px auto;
+      display: grid;
+      grid-template-columns: 1fr 1.1fr;
+      gap: 28px;
+      align-items: start;
+      flex: 1;
+    }
+
+    /* Left Panel: Input Form Card */
+    .panel {
+      background: #ffffff;
+      padding: 28px;
+      border: 1px solid #e2e8f0;
+      border-radius: 18px;
+      box-shadow: 0 10px 30px rgba(30, 41, 59, 0.05);
+    }
+
+    .panel-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .eyebrow {
+      color: #2563eb;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+
+    h2 {
+      margin: 8px 0;
+      font-size: 22px;
+      color: #0f172a;
+    }
+
+    .muted {
+      margin: 0 0 10px;
+      line-height: 1.5;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      font-size: 14px;
+      margin: 14px 0 6px;
+      color: #1e293b;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 11px 13px;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      font: inherit;
+      font-size: 14px;
+      color: #0f172a;
+      background: #ffffff;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    input::placeholder, textarea::placeholder {
+      color: #94a3b8;
+    }
+
+    input:focus, textarea:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px #dbeafe;
+      border-color: #2563eb;
+    }
+
+    textarea {
+      resize: vertical;
+      line-height: 1.5;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 10px;
+      background: linear-gradient(110deg, #2563eb, #4f46e5);
+      color: #ffffff;
+      font: inherit;
+      font-weight: 700;
+      padding: 13px 18px;
+      cursor: pointer;
+      transition: opacity 0.15s, transform 0.1s;
+    }
+
+    button:hover:not(:disabled) {
+      opacity: 0.92;
+    }
+
+    button:active:not(:disabled) {
+      transform: scale(0.99);
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    #generate-btn {
+      width: 100%;
+      margin-top: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .secondary {
+      background: #eff6ff;
+      color: #1d4ed8;
+      padding: 9px 16px;
+      font-size: 14px;
+    }
+
+    .secondary:hover:not(:disabled) {
+      background: #dbeafe;
+      opacity: 1;
+    }
+
+    .sample-btn {
+      background: #f1f5f9;
+      color: #334155;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .sample-btn:hover:not(:disabled) {
+      background: #e2e8f0;
+      color: #0f172a;
+      opacity: 1;
+    }
+
+    .status {
+      margin-top: 14px;
+      font-size: 14px;
+      color: #0f766e;
+      min-height: 20px;
+      font-weight: 500;
+    }
+
+    .status.error {
+      color: #dc2626;
+    }
+
+    .status.loading {
+      color: #2563eb;
+    }
+
+    /* Right Panel: Live A4 Resume Preview */
+    .preview-wrapper {
+      position: sticky;
+      top: 90px;
+    }
+
+    .preview-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      gap: 12px;
+    }
+
+    .resume-sheet {
+      background: #ffffff;
+      padding: 40px 44px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      box-shadow: 0 12px 32px rgba(15, 23, 42, 0.08);
+      color: #0f172a;
+      line-height: 1.55;
+      min-height: 760px;
+    }
+
+    .resume-header {
+      border-bottom: 2px solid #1e293b;
+      padding-bottom: 14px;
+      margin-bottom: 18px;
+    }
+
+    .resume-header h1 {
+      margin: 0;
+      font-size: 26px;
+      letter-spacing: -0.5px;
+      color: #0f172a;
+    }
+
+    .resume-role {
+      margin: 4px 0;
+      font-weight: 700;
+      color: #2563eb;
+      font-size: 15px;
+    }
+
+    .resume-contact {
+      margin: 0;
+      font-size: 13px;
+      color: #475569;
+    }
+
+    .resume-section {
+      margin-bottom: 18px;
+    }
+
+    .resume-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .resume-section h3 {
+      font-size: 13px;
+      letter-spacing: 1px;
+      color: #1e293b;
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 4px;
+      margin: 0 0 8px;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .resume-section h4 {
+      margin: 0 0 6px;
+      font-size: 15px;
+      color: #0f172a;
+    }
+
+    .resume-section p {
+      margin: 0;
+      font-size: 14px;
+      color: #1e293b;
+    }
+
+    .skills-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .skills-list li {
+      background: #f1f5f9;
+      color: #0f172a;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .bullet-list {
+      margin: 0;
+      padding-left: 18px;
+      font-size: 14px;
+      color: #1e293b;
+    }
+
+    .bullet-list li {
+      margin-bottom: 5px;
+    }
+
+    footer {
+      text-align: center;
+      color: #64748b;
+      font-size: 13px;
+      padding: 20px 0 32px;
+    }
+
+    /* Spinner Animation */
+    .spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.35);
+      border-top-color: #ffffff;
+      border-radius: 50%;
+      animation: spin 0.75s linear infinite;
+      display: inline-block;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Responsive Layout */
+    @media (max-width: 900px) {
+      .workspace {
+        grid-template-columns: 1fr;
+      }
+      .preview-wrapper {
+        position: static;
+      }
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+      .resume-sheet {
+        padding: 28px 24px;
+        min-height: auto;
+      }
+    }
+
+    /* Print / PDF Export Formatting */
+    @media print {
+      body {
+        background: #ffffff;
+      }
+      .no-print {
+        display: none !important;
+      }
+      .workspace {
+        display: block;
+        width: 100%;
+        margin: 0;
+      }
+      .preview-wrapper {
+        position: static;
+      }
+      .resume-sheet {
+        border: none;
+        box-shadow: none;
+        padding: 0;
+        min-height: auto;
+      }
+      .skills-list li {
+        border: 1px solid #cbd5e1;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Top Navigation Bar -->
+  <header class="topbar no-print">
+    <a class="brand" href="#top">ResumeCraft AI</a>
+    <span class="tag">ATS-Friendly Resume Generator</span>
+  </header>
+
+  <!-- Main Split-Screen Workspace -->
+  <main class="workspace" id="top">
+    <!-- Left Panel: Input Form -->
+    <section class="panel form-panel no-print">
+      <div class="panel-header-row">
+        <span class="eyebrow">STEP 1: ENTER YOUR DETAILS</span>
+        <button id="fill-sample-btn" class="sample-btn" type="button" title="Populate with sample student data for quick testing & screenshots">
+          Fill Sample Data
+        </button>
+      </div>
+      <h2>Build Your Resume</h2>
+      <p class="muted">Fill in your basic details and let AI rewrite them into strong, recruiter-ready statements.</p>
+
+      <form id="resume-form" novalidate>
+        <label for="name">Full Name *</label>
+        <input id="name" type="text" placeholder="e.g. Aarav Patel" required>
+
+        <div class="form-grid">
+          <div>
+            <label for="email">Email Address</label>
+            <input id="email" type="email" placeholder="aarav.patel@example.com">
+          </div>
+          <div>
+            <label for="phone">Phone Number</label>
+            <input id="phone" type="text" placeholder="+91 98765 43210">
+          </div>
+        </div>
+
+        <label for="role">Target Job Role *</label>
+        <input id="role" type="text" placeholder="e.g. Junior Python Developer / AI Intern" required>
+
+        <label for="skills">Technical Skills (comma-separated) *</label>
+        <input id="skills" type="text" placeholder="e.g. Python, Flask, HTML, CSS, SQL, Git" required>
+
+        <label for="education">Education</label>
+        <input id="education" type="text" placeholder="e.g. B.Tech in CSE (AI & ML), Marwadi University (2024-2028)">
+
+        <label for="project-title">Key Project Title</label>
+        <input id="project-title" type="text" placeholder="e.g. AI-Based Resume Builder">
+
+        <label for="project-desc">Brief Project Notes (AI will expand this)</label>
+        <textarea id="project-desc" rows="3" placeholder="e.g. Built a web app using Flask and Gemini API that helps students format resumes and export PDFs."></textarea>
+
+        <button id="generate-btn" type="submit">Enhance &amp; Generate Resume</button>
+      </form>
+
+      <p id="status" class="status" role="status" aria-live="polite"></p>
+    </section>
+
+    <!-- Right Panel: Live A4 Resume Preview -->
+    <section class="preview-wrapper">
+      <div class="preview-toolbar no-print">
+        <span class="eyebrow">STEP 2: LIVE PREVIEW</span>
+        <button id="print-btn" class="secondary" type="button">Download / Print PDF</button>
+      </div>
+
+      <article id="resume-sheet" class="resume-sheet">
+        <header class="resume-header">
+          <h1 id="prev-name">Your Full Name</h1>
+          <p id="prev-role" class="resume-role">Target Job Role</p>
+          <p id="prev-contact" class="resume-contact">email@example.com | +91 00000 00000</p>
+        </header>
+
+        <div class="resume-section">
+          <h3>PROFESSIONAL SUMMARY</h3>
+          <p id="prev-summary">Enter your details on the left and click "Enhance &amp; Generate Resume" to generate an ATS-optimized professional summary.</p>
+        </div>
+
+        <div class="resume-section">
+          <h3>TECHNICAL SKILLS</h3>
+          <ul id="prev-skills" class="skills-list">
+            <li>Python</li>
+            <li>HTML5 &amp; CSS3</li>
+            <li>JavaScript</li>
+          </ul>
+        </div>
+
+        <div class="resume-section">
+          <h3>ACADEMIC &amp; PERSONAL PROJECTS</h3>
+          <h4 id="prev-project-title">Project Title</h4>
+          <ul id="prev-project-bullets" class="bullet-list">
+            <li>AI-generated action-oriented project highlights will appear here.</li>
+          </ul>
+        </div>
+
+        <div class="resume-section">
+          <h3>EDUCATION</h3>
+          <p id="prev-education">Degree, University Name, Graduation Year</p>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <footer class="no-print">Developed with Flask &amp; Google Gemini AI</footer>
+
+  <script>
+    // DOM Element References
+    const form = document.getElementById("resume-form");
+    const generateBtn = document.getElementById("generate-btn");
+    const printBtn = document.getElementById("print-btn");
+    const fillSampleBtn = document.getElementById("fill-sample-btn");
+    const statusBox = document.getElementById("status");
+
+    // Input Fields
+    const inputs = {
+      name: document.getElementById("name"),
+      email: document.getElementById("email"),
+      phone: document.getElementById("phone"),
+      role: document.getElementById("role"),
+      skills: document.getElementById("skills"),
+      education: document.getElementById("education"),
+      projectTitle: document.getElementById("project-title"),
+      projectDesc: document.getElementById("project-desc")
+    };
+
+    // Preview Fields
+    const preview = {
+      name: document.getElementById("prev-name"),
+      role: document.getElementById("prev-role"),
+      contact: document.getElementById("prev-contact"),
+      summary: document.getElementById("prev-summary"),
+      skills: document.getElementById("prev-skills"),
+      projectTitle: document.getElementById("prev-project-title"),
+      projectBullets: document.getElementById("prev-project-bullets"),
+      education: document.getElementById("prev-education")
+    };
+
+    // Track whether AI has generated enhanced summary/bullets so live typing preserves them
+    let hasAiEnhancedContent = false;
+
+    // Gemini API Configuration (Runtime provides key automatically when left empty)
+    const apiKey = "";
+    const MODEL_NAME = "gemini-2.5-flash";
+
+    function setStatus(message, type = "success") {
+      statusBox.textContent = message;
+      statusBox.className = "status";
+      if (type === "error") statusBox.classList.add("error");
+      if (type === "loading") statusBox.classList.add("loading");
+    }
+
+    // Live Basic Preview Sync while typing
+    function syncBasicPreview() {
+      const nameVal = inputs.name.value.trim();
+      const roleVal = inputs.role.value.trim();
+      const emailVal = inputs.email.value.trim();
+      const phoneVal = inputs.phone.value.trim();
+      const skillsVal = inputs.skills.value.trim();
+      const eduVal = inputs.education.value.trim();
+      const projTitleVal = inputs.projectTitle.value.trim();
+      const projDescVal = inputs.projectDesc.value.trim();
+
+      preview.name.textContent = nameVal || "Your Full Name";
+      preview.role.textContent = roleVal || "Target Job Role";
+
+      const contactParts = [emailVal, phoneVal].filter(Boolean);
+      preview.contact.textContent =
+        contactParts.length > 0 ? contactParts.join(" | ") : "email@example.com | +91 00000 00000";
+
+      preview.projectTitle.textContent = projTitleVal || "Project Title";
+      preview.education.textContent = eduVal || "Degree, University Name, Graduation Year";
+
+      // Update skills pills live if AI hasn't overwritten them yet
+      if (!hasAiEnhancedContent) {
+        const rawSkills = skillsVal
+          ? skillsVal.split(",").map(s => s.trim()).filter(Boolean)
+          : ["Python", "HTML5 & CSS3", "JavaScript"];
+
+        renderSkillsList(rawSkills);
+
+        if (projDescVal) {
+          renderBulletList([projDescVal]);
+        } else {
+          renderBulletList(["AI-generated action-oriented project highlights will appear here."]);
+        }
+      }
+    }
+
+    function renderSkillsList(skillsArray) {
+      preview.skills.replaceChildren();
+      skillsArray.forEach((skill) => {
+        const li = document.createElement("li");
+        li.textContent = skill;
+        preview.skills.appendChild(li);
+      });
+    }
+
+    function renderBulletList(bulletsArray) {
+      preview.projectBullets.replaceChildren();
+      bulletsArray.forEach((bullet) => {
+        const li = document.createElement("li");
+        li.textContent = bullet;
+        preview.projectBullets.appendChild(li);
+      });
+    }
+
+    // Attach real-time input listeners
+    Object.values(inputs).forEach((el) => {
+      el.addEventListener("input", syncBasicPreview);
+    });
+
+    // Helper: Populate sample data for quick Marwadi University project report screenshots
+    fillSampleBtn.addEventListener("click", () => {
+      inputs.name.value = "Aarav Patel";
+      inputs.email.value = "aarav.patel@example.com";
+      inputs.phone.value = "+91 98765 43210";
+      inputs.role.value = "Junior Python Developer / AI Intern";
+      inputs.skills.value = "Python, Flask, HTML5, CSS3, JavaScript, SQL, Git, Google Gemini API";
+      inputs.education.value = "B.Tech in CSE (AI & ML), Marwadi University (2024–2028)";
+      inputs.projectTitle.value = "ResumeCraft AI – AI-Based Resume Builder";
+      inputs.projectDesc.value = "Built a split-screen web application using Python, Flask, and Google Gemini API that transforms raw student notes into ATS-friendly resumes with one-click PDF export.";
+
+      hasAiEnhancedContent = false;
+      syncBasicPreview();
+      setStatus("Sample details filled! Click 'Enhance & Generate Resume' to run AI enhancement.");
+    });
+
+    // Offline Fallback Enhancer (matches report's fallback_resume logic)
+    function fallbackResumeEnhancer(data) {
+      const role = data.role || "Software Developer";
+      let skillsList = data.skills
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean);
+
+      if (skillsList.length === 0) {
+        skillsList = ["Python", "HTML/CSS", "Problem Solving"];
+      }
+
+      const projectName = data.project_title || "AI Web Application";
+
+      return {
+        summary: `Motivated and detail-oriented ${role} candidate with a strong foundation in ${skillsList.slice(0, 3).join(", ")}. Passionate about building efficient, user-centric applications and contributing to collaborative engineering teams.`,
+        skills: skillsList,
+        project_bullets: [
+          `Designed and developed '${projectName}' utilizing ${skillsList.slice(0, 3).join(", ")} to automate structured resume creation.`,
+          "Implemented a responsive split-screen user interface with real-time document preview and print-ready A4 PDF formatting.",
+          "Tested and debugged end-to-end application workflows to ensure reliable validation, smooth usability, and fast execution."
+        ]
+      };
+    }
+
+    // Exponential Backoff Fetch Helper for Gemini API
+    async function fetchWithBackoff(url, options, maxRetries = 3) {
+      let delay = 1000;
+      for (let attempt = 0; attempt <= maxRetries; attempt++) {
+        const response = await fetch(url, options);
+        if (response.ok || (response.status !== 429 && response.status < 500) || attempt === maxRetries) {
+          return response;
+        }
+        await new Promise((resolve) => setTimeout(resolve, delay));
+        delay *= 2;
+      }
+    }
+
+    // Call Google Gemini API with Structured JSON Schema
+    async function enhanceResumeWithGemini(data) {
+      const prompt = `
+Act as an expert career coach and ATS resume writer. Enhance the following student details into a polished, professional resume section tailored for the target role.
+
+Full Name: ${data.name}
+Target Role: ${data.role}
+Raw Skills: ${data.skills}
+Education: ${data.education || "Not specified"}
+Project Title: ${data.project_title || "Academic Project"}
+Raw Project Description: ${data.project_desc || "Built a software application demonstrating technical problem solving."}
+
+Requirements:
+- "summary": A strong 2-3 sentence professional career objective/summary tailored specifically to the Target Role.
+- "skills": A clean array of strings organizing and refining the candidate's technical skills.
+- "project_bullets": An array of 3 impactful, action-verb-driven bullet points describing the project and its technical impact.
+      `.trim();
+
+      const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent?key=${apiKey}`;
+
+      const payload = {
+        contents: [
+          {
+            role: "user",
+            parts: [{ text: prompt }]
+          }
+        ],
+        generationConfig: {
